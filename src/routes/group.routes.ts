@@ -7,6 +7,7 @@ import {
   removeGroup,
   addUsersToGroup,
 } from '../controllers/group.controller.js';
+import { checkPermission } from '../middleware/permission.middleware.js';
 
 import { authenticateJWT } from '../middleware/auth.middleware.js';
 
@@ -14,13 +15,13 @@ const router = express.Router();
 
 router.use(authenticateJWT);
 
-router.get('/', listGroups);
-router.get('/:id', getGroup);
-router.post('/', createNewGroup);
-router.put('/:id', updateGroupById);
-router.delete('/:id', removeGroup);
+router.get('/', checkPermission('Groups', 'read'), listGroups);
+router.get('/:id',checkPermission('Groups', 'read'), getGroup);
+router.post('/',checkPermission('Groups', 'create'), createNewGroup);
+router.put('/:id',checkPermission('Groups', 'update'), updateGroupById);
+router.delete('/:id',checkPermission('Groups', 'delete'), removeGroup);
 
 // Assign users to group
-router.post('/:groupId/users', addUsersToGroup);
+router.post('/:groupId/users',checkPermission('Groups', 'update'), addUsersToGroup);
 
 export default router;
