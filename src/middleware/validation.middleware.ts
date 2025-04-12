@@ -30,10 +30,15 @@ export const validateRequest = (
 ): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    let message = errors.array().map((err: any) => ({
+      field: err.param,
+      message: err.msg,
+    }))
     res.status(400).json({
       status: 'error',
-      message: 'Validation failed',
-      errors: errors.array().map((err:any) => ({
+      message: message[0]?.message,
+
+      errors: errors.array().map((err: any) => ({
         field: err.param,
         message: err.msg,
       })),
