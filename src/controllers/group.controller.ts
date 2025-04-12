@@ -168,3 +168,42 @@ export const addUsersToGroup = async (req: Request, res: Response): Promise<any>
       });
     }
   };
+
+
+  export const removeUserFromGroup = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const groupId = Number(req.params.groupId);
+      const userId = Number(req.params.userId);
+  
+      if (isNaN(groupId) || isNaN(userId)) {
+        return res.status(400).json({ status: 'error', message: 'Invalid group or user ID' });
+      }
+  
+      const exists = await db('users_groups')
+        .where({ group_id: groupId, user_id: userId })
+        .first();
+  
+      if (!exists) {
+        return res.status(404).json({
+          status: 'error',
+          message: `User ${userId} is not in group ${groupId}`,
+        });
+      }
+  
+      await db('users_groups')
+        .where({ group_id: groupId, user_id: userId })
+        .delete();
+  
+      return res.json({
+        status: 'success',
+        message: `User ${userId} removed from group ${groupId}`,
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to remove user from group',
+        error: error.message,
+      });
+    }
+  };
+  

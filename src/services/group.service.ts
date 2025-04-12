@@ -1,9 +1,26 @@
 import db from '../database/db.js';
 import { Group } from '../models/group.model.js';
 
-export const getAllGroups = async (): Promise<Group[]> => {
-  return db<Group>('groups').select('*');
+export const getAllGroups = async () => {
+  const groups = await db('groups').select('*');
+
+  const enrichedGroups = await Promise.all(
+    groups.map(async (group) => {
+      const users = await db('users_groups as ug')
+        .join('users as u', 'ug.user_id', 'u.id')
+        .where('ug.group_id', group.id)
+        .select('u.id', 'u.username', 'u.email');
+
+      return {
+        ...group,
+        users,
+      };
+    })
+  );
+
+  return enrichedGroups;
 };
+
 
 export const getGroupById = async (id: number): Promise<Group | undefined> => {
   return db<Group>('groups').where({ id }).first();

@@ -6,6 +6,7 @@ import {
   updateGroupById,
   removeGroup,
   addUsersToGroup,
+  removeUserFromGroup
 } from '../controllers/group.controller.js';
 import { checkPermission } from '../middleware/permission.middleware.js';
 
@@ -23,5 +24,6 @@ router.delete('/:id',checkPermission('Groups', 'delete'), removeGroup);
 
 // Assign users to group
 router.post('/:groupId/users',checkPermission('Groups', 'update'), addUsersToGroup);
+router.delete('/:groupId/users/:userId', checkPermission('Groups', 'update'), removeUserFromGroup);
 
 export default router;

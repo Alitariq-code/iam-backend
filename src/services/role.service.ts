@@ -2,8 +2,24 @@
 import db from '../database/db.js';
 import { Role } from '../models/role.model.js';
 
-export const getAllRoles = async (): Promise<Role[]> => {
-  return db<Role>('roles').select('*');
+export const getAllRoles = async () => {
+  const roles = await db<Role>('roles').select('*');
+
+  const enrichedRoles = await Promise.all(
+    roles.map(async (role) => {
+      const groups = await db('groups_roles as gr')
+        .join('groups as g', 'gr.group_id', 'g.id')
+        .where('gr.role_id', role.id)
+        .select('g.id', 'g.name');
+
+      return {
+        ...role,
+        groups,
+      };
+    })
+  );
+
+  return enrichedRoles;
 };
 
 export const getRoleById = async (id: number): Promise<Role | undefined> => {

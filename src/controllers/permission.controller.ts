@@ -82,6 +82,8 @@ export const removePermission = async (req: Request, res: Response) :Promise<any
 export const addPermissionsToRole = async (req: Request, res: Response):Promise<any>  => {
   try {
     const roleId = Number(req.params.roleId);
+    console.log('Role ID:', roleId);
+    console.log('Request Body:', req.body);
     const { permissionIds } = req.body;
 
     const role = await db('roles').where({ id: roleId }).first();
@@ -124,6 +126,8 @@ export const getMyPermissions = async (req: Request, res: Response):Promise<any>
     try {
       const { module, action } = req.body;
       const userId = (req as any).user?.id;
+
+      console.log(userId,'userId')
   
       if (!userId) {
         return res.status(401).json({ status: 'error', message: 'Unauthorized' });
